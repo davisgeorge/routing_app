@@ -1,0 +1,289 @@
+rules_version = '2';
+
+// No Cloud Functions / Admin SDK in this project (Spark plan — Cloud
+// Functions require Blaze). Every write that would normally go through a
+// privileged server function is instead a direct client write validated
+// here. Two schema conventions make that possible:
+//  - `users/{userId}` doc ID == Firebase Auth UID.
+//  - `join_requests/{requestId}` doc ID == `${user_id}_${group_id}`, so an
+//    admin's rule can look up "is there a pending request for this exact
+//    user+group" with a single get() instead of a query.
+// `invites/{token}` uses the invite token itself as the doc ID: the token
+// is an unguessable capability, so a `get` of one specific invite is public,
+// while listing/querying the collection stays admin-only.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function role() {
+      return isSignedIn() ? userDoc().role : null;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && role() == 'super_admin';
+    }
+
+    function isAdmin() {
+      return isSignedIn() && role() == 'admin';
+    }
+
+    function myGroupId() {
+      return userDoc().group_id;
+    }
+
+    function territoryGroupId(territoryId) {
+      return get(/databases/$(database)/documents/territories/$(territoryId)).data.group_id;
+    }
+
+    function pendingJoinRequest(userId, groupId) {
+      return get(/databases/$(database)/documents/join_requests/$(userId + '_' + groupId)).data.status == 'pending';
+    }
+
+    // ---- users ----
+    match /users/{userId} {
+      allow read: if isSignedIn() && (
+        userId == request.auth.uid ||
+        isSuperAdmin() ||
+        (isAdmin() && resource.data.group_id == myGroupId())
+      );
+      allow create: if isSignedIn() && (
+        // Self-registration (invite or join-request flow) always starts
+        // groupless — an admin grants membership in a separate step.
+        (userId == request.auth.uid && request.resource.data.role == 'user' && request.resource.data.group_id == null) ||
+        // Super admin provisioning a new admin's profile (their Auth account
+        // was created client-side via a secondary, throwaway Firebase app).
+        (isSuperAdmin() && request.resource.data.role == 'admin') ||
+        // Admin (own group) or super admin (any group) directly creating a
+        // publisher account — same secondary-app trick, no invite needed.
+        (isAdmin() && request.resource.data.role == 'user' && request.resource.data.group_id == myGroupId()) ||
+        (isSuperAdmin() && request.resource.data.role == 'user')
+      );
+      allow update: if isSignedIn() && (
+        (userId == request.auth.uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name'])) ||
+        (isAdmin() &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['group_id']) && (
+            // Only a 'user'-role account can be merged into a group this way —
+            // an admin or super_admin's own group_id must stay null.
+            (resource.data.role == 'user' && request.resource.data.group_id == myGroupId() && pendingJoinRequest(userId, myGroupId())) ||
+            (request.resource.data.group_id == null && resource.data.group_id == myGroupId())
+          )) ||
+        // Super admin can do everything an admin can, for any group — not
+        // just their own (they don't have one).
+        (isSuperAdmin() &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['group_id']) && (
+            (resource.data.role == 'user' && request.resource.data.group_id != null && pendingJoinRequest(userId, request.resource.data.group_id)) ||
+            request.resource.data.group_id == null
+          ))
+      );
+      allow delete: if false;
+    }
+
+    // ---- groups ----
+    match /groups/{groupId} {
+      allow read: if isSuperAdmin() || (isSignedIn() && groupId == myGroupId());
+      allow create: if isSuperAdmin();
+      allow update, delete: if false;
+    }
+
+    // ---- group_members ----
+    match /group_members/{memberId} {
+      allow read: if isSuperAdmin() ||
+        (isAdmin() && resource.data.group_id == myGroupId()) ||
+        (isSignedIn() && resource.data.user_id == request.auth.uid);
+      // Admin (or super admin, for any group) adds a member either by
+      // approving that exact user's pending request, OR because the target's
+      // users/{uid} doc already has this group_id (the direct-create-a-
+      // publisher flow sets that first, in a separate write, then adds this
+      // membership record). Either way, only a 'user'-role account can
+      // become a group member (not another admin/super_admin).
+      allow create: if
+        (isAdmin() && request.resource.data.group_id == myGroupId() &&
+          get(/databases/$(database)/documents/users/$(request.resource.data.user_id)).data.role == 'user' &&
+          (pendingJoinRequest(request.resource.data.user_id, myGroupId()) ||
+            get(/databases/$(database)/documents/users/$(request.resource.data.user_id)).data.group_id == myGroupId())) ||
+        (isSuperAdmin() &&
+          get(/databases/$(database)/documents/users/$(request.resource.data.user_id)).data.role == 'user' &&
+          (pendingJoinRequest(request.resource.data.user_id, request.resource.data.group_id) ||
+            get(/databases/$(database)/documents/users/$(request.resource.data.user_id)).data.group_id == request.resource.data.group_id));
+      allow update: if
+        (isAdmin() && resource.data.group_id == myGroupId() &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])) ||
+        (isSuperAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']));
+      allow delete: if false;
+    }
+
+    // ---- regions ----
+    match /regions/{regionId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSuperAdmin(); // import screen seeds these
+      allow delete: if false;
+    }
+
+    // ---- territories ----
+    match /territories/{territoryId} {
+      allow read: if isSuperAdmin() || (isSignedIn() && resource.data.group_id == myGroupId());
+      // Import screen (super admin) or an admin manually creating a new
+      // territory/map in their own group.
+      allow create: if isSuperAdmin() || (isAdmin() && request.resource.data.group_id == myGroupId());
+      allow update: if
+        isSuperAdmin() || // import screen (re-import merges / total_addresses increments)
+        (isAdmin() && resource.data.group_id == myGroupId() &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'total_addresses'])) ||
+        // No server trigger is available, so the publisher who completes the
+        // last door in the territory flips it to completed themselves.
+        (isSignedIn() && resource.data.group_id == myGroupId() &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+          request.resource.data.status == 'completed');
+      allow delete: if false;
+    }
+
+    // ---- addresses ----
+    match /addresses/{addressId} {
+      allow read: if isSuperAdmin() ||
+        (isSignedIn() && territoryGroupId(resource.data.territory_id) == myGroupId());
+      // Import screen (super admin) or an admin manually adding a single
+      // address to a territory in their own group.
+      allow create, update: if isSuperAdmin() ||
+        (isAdmin() && territoryGroupId(request.resource.data.territory_id) == myGroupId());
+      allow delete: if false;
+    }
+
+    // ---- territory_assignments ----
+    match /territory_assignments/{assignmentId} {
+      // Any member of the territory's group can see who's assigned — needed
+      // client-side for conflict checks and multi-assignee completion checks
+      // now that there's no trusted server to compute those centrally.
+      // The own-uid branch is NOT redundant with the group-wide one below:
+      // Firestore's list-rule evaluation can fail with "Property territory_id
+      // is undefined" when a query (like "my own assignments", filtered only
+      // by user_id + status) doesn't itself filter on territory_id — the
+      // cross-document territoryGroupId() lookup isn't reliably available in
+      // that case. Matching the query's own filter field here keeps it safe.
+      // The admin branch looks up the ASSIGNEE's own group_id (a field the
+      // query already filters by, e.g. Members page querying by user_id in
+      // [...]) rather than territoryGroupId(), which would hit the same
+      // "undefined" issue for that query shape.
+      allow read: if isSuperAdmin() ||
+        (isSignedIn() && resource.data.user_id == request.auth.uid) ||
+        (isAdmin() && get(/databases/$(database)/documents/users/$(resource.data.user_id)).data.group_id == myGroupId()) ||
+        (isSignedIn() && territoryGroupId(resource.data.territory_id) == myGroupId());
+      allow create: if
+        (isAdmin() &&
+          territoryGroupId(request.resource.data.territory_id) == myGroupId() &&
+          get(/databases/$(database)/documents/users/$(request.resource.data.user_id)).data.group_id == myGroupId() &&
+          request.resource.data.assigned_by == request.auth.uid &&
+          request.resource.data.status == 'active') ||
+        (isSuperAdmin() &&
+          get(/databases/$(database)/documents/users/$(request.resource.data.user_id)).data.group_id == territoryGroupId(request.resource.data.territory_id) &&
+          request.resource.data.assigned_by == request.auth.uid &&
+          request.resource.data.status == 'active');
+      // A publisher may set their optimised route order and mark their own
+      // assignment complete. An admin (or super admin, for any group) may
+      // recall an active assignment (e.g. when removing a member) so the
+      // territory frees up for reassignment.
+      allow update: if isSignedIn() && (
+        (resource.data.user_id == request.auth.uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'completed_at', 'route_sequence'])) ||
+        (isAdmin() && territoryGroupId(resource.data.territory_id) == myGroupId() &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+          request.resource.data.status == 'recalled') ||
+        (isSuperAdmin() &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+          request.resource.data.status == 'recalled')
+      );
+      allow delete: if false;
+    }
+
+    // ---- call_records (immutable) ----
+    match /call_records/{recordId} {
+      // Readable by the whole group (not just admin/self) so a client can
+      // tell whether every address in a shared territory has been visited
+      // by ANY of its assignees — that check used to run in a Cloud Function.
+      // The own-uid branch is NOT redundant with the group-wide one below —
+      // see the matching comment on territory_assignments' read rule: a list
+      // query filtered only by recorded_by (not territory_id) needs a branch
+      // that only depends on fields the query itself already filters by.
+      // The admin branch looks up the RECORDER's own group_id (a field the
+      // query already filters by, e.g. Members page querying by recorded_by
+      // in [...]) rather than territoryGroupId(), which would hit the same
+      // "undefined" issue for that query shape.
+      allow read: if isSuperAdmin() ||
+        (isSignedIn() && resource.data.recorded_by == request.auth.uid) ||
+        (isAdmin() && get(/databases/$(database)/documents/users/$(resource.data.recorded_by)).data.group_id == myGroupId()) ||
+        (isSignedIn() && territoryGroupId(resource.data.territory_id) == myGroupId());
+      allow create: if isSignedIn() &&
+        request.resource.data.recorded_by == request.auth.uid &&
+        request.resource.data.keys().hasAll(['address_id', 'territory_id', 'recorded_by', 'call_number', 'status', 'source', 'recorded_at']);
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ---- personal_routes ----
+    match /personal_routes/{routeId} {
+      allow read: if isSuperAdmin() ||
+        (isSignedIn() && resource.data.user_id == request.auth.uid) ||
+        // Active routes are visible group-wide so self-select can warn about
+        // addresses someone else already claimed (best-effort, client-checked).
+        (isSignedIn() && resource.data.status == 'active' && resource.data.group_id == myGroupId());
+      allow create: if isSignedIn() &&
+        request.resource.data.user_id == request.auth.uid &&
+        // Super admin isn't tied to one group, so they may route within any
+        // of them; everyone else only within their own.
+        (request.resource.data.group_id == myGroupId() || isSuperAdmin());
+      allow update: if isSignedIn() && resource.data.user_id == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.user_id == request.auth.uid;
+    }
+
+    // ---- invites ----
+    match /invites/{token} {
+      allow get: if true; // the token itself is the capability/secret
+      allow list: if isSuperAdmin() || (isAdmin() && resource.data.group_id == myGroupId());
+      allow create: if
+        (isAdmin() && request.resource.data.group_id == myGroupId() &&
+          request.resource.data.invited_by == request.auth.uid && request.resource.data.status == 'pending') ||
+        (isSuperAdmin() &&
+          request.resource.data.invited_by == request.auth.uid && request.resource.data.status == 'pending');
+      // The invited person (proven via their own Auth email claim) marks it
+      // used once they've registered — doesn't grant group access by itself.
+      allow update: if isSignedIn() &&
+        resource.data.status == 'pending' &&
+        resource.data.email == request.auth.token.email &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'user_id']) &&
+        request.resource.data.status == 'accepted' &&
+        request.resource.data.user_id == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // ---- join_requests ----
+    match /join_requests/{requestId} {
+      allow read: if isSuperAdmin() ||
+        (isAdmin() && resource.data.group_id == myGroupId()) ||
+        (isSignedIn() && resource.data.user_id == request.auth.uid);
+      // Only a 'user'-role account can request to join a group — an admin or
+      // super_admin's identity is separate from group membership.
+      allow create: if isSignedIn() &&
+        role() == 'user' &&
+        request.resource.data.user_id == request.auth.uid &&
+        requestId == (request.auth.uid + '_' + request.resource.data.group_id) &&
+        request.resource.data.status == 'pending';
+      allow update: if
+        (isAdmin() && resource.data.group_id == myGroupId() &&
+          resource.data.status == 'pending' &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'resolved_at']) &&
+          request.resource.data.status in ['accepted', 'declined']) ||
+        (isSuperAdmin() &&
+          resource.data.status == 'pending' &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'resolved_at']) &&
+          request.resource.data.status in ['accepted', 'declined']);
+      allow delete: if false;
+    }
+  }
+}

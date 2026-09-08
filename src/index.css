@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-slate-50 font-sans text-slate-900 antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-slate-200/70 bg-white p-5 shadow-soft;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+  }
+
+  .btn-soft {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-50 px-4 py-2.5 text-sm font-semibold text-brand-700 transition-all hover:bg-brand-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-brand focus:bg-white focus:ring-4 focus:ring-brand-100;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-slate-700;
+  }
+
+  .pill-available,
+  .pill-active,
+  .pill-complete {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+  .pill-available::before,
+  .pill-active::before,
+  .pill-complete::before {
+    content: '';
+    @apply inline-block h-1.5 w-1.5 shrink-0 rounded-full;
+  }
+
+  .pill-available {
+    @apply bg-slate-100 text-slate-600;
+  }
+  .pill-available::before {
+    @apply bg-slate-400;
+  }
+
+  .pill-active {
+    @apply bg-amber-50 text-amber-700;
+  }
+  .pill-active::before {
+    @apply bg-amber-500;
+  }
+
+  .pill-complete {
+    @apply bg-emerald-50 text-emerald-700;
+  }
+  .pill-complete::before {
+    @apply bg-emerald-500;
+  }
+
+  /* Fakes a dark navigation map (Google Maps' driving/walking night theme)
+     from plain OpenStreetMap tiles via a CSS filter — no paid dark tile
+     provider needed. Used only for the active turn-by-turn route map. */
+  .map-tiles-dark {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+  }
+  .dark-nav-map .leaflet-container {
+    background: #0b1220;
+  }
+}

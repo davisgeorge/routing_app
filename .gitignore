@@ -1,0 +1,27 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.local
+
+# Firebase
+.firebase
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# Claude Code local settings (machine/session-specific permissions)
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Source data (contains real addresses/PII)
+Master_Map_routing.xlsm
