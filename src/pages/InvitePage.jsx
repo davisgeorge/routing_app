@@ -4,12 +4,14 @@ import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase/config'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 import Spinner from '../components/shared/Spinner'
 
 export default function InvitePage() {
   const { token } = useParams()
   const navigate = useNavigate()
   const { user, profile, loading: authLoading } = useAuth()
+  const { theme } = useTheme()
 
   const [invite, setInvite] = useState(null)
   const [loadingInvite, setLoadingInvite] = useState(true)
@@ -97,7 +99,7 @@ export default function InvitePage() {
 
   if (authLoading || loadingInvite) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900">
         <Spinner label="Checking your invite…" />
       </div>
     )
@@ -106,27 +108,32 @@ export default function InvitePage() {
   return (
     <div
       className="flex min-h-screen items-center justify-center px-4"
-      style={{ background: 'radial-gradient(60% 50% at 50% 0%, rgb(47 86 217 / 0.08), transparent), #f8fafc' }}
+      style={{
+        background:
+          theme === 'dark'
+            ? 'radial-gradient(60% 50% at 50% 0%, rgb(47 86 217 / 0.18), transparent), #020617'
+            : 'radial-gradient(60% 50% at 50% 0%, rgb(47 86 217 / 0.08), transparent), #f8fafc',
+      }}
     >
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
           <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-brand text-lg font-bold text-white shadow-md shadow-brand-600/20">
             T
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">TerritoryMap</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">TerritoryMap</h1>
         </div>
 
         <div className="card space-y-4">
           {loadError && !user ? (
             <>
-              <p className="text-sm text-red-600">{loadError}</p>
+              <p className="text-sm text-red-600 dark:text-red-400">{loadError}</p>
               <button type="button" className="btn-ghost w-full" onClick={() => navigate('/login')}>
                 Back to sign in
               </button>
             </>
           ) : user && profile && profile.role !== 'user' ? (
             <>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 You're signed in as <span className="font-medium">{user.email}</span> ({profile.role.replace('_', ' ')}).
                 That account type can't join a group as a publisher — sign out and use a regular account to accept
                 this invite, or ask them to open the link themselves.
@@ -137,18 +144,18 @@ export default function InvitePage() {
             </>
           ) : user ? (
             <>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 You're signed in as <span className="font-medium">{user.email}</span>. Send a request to join{' '}
                 <span className="font-medium">{invite?.group_name}</span>?
               </p>
-              {submitError && <p className="text-sm text-red-600">{submitError}</p>}
+              {submitError && <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>}
               <button type="button" disabled={submitting} className="btn-primary w-full" onClick={handleExistingUserJoin}>
                 {submitting ? 'Sending…' : 'Request to join'}
               </button>
             </>
           ) : (
             <form onSubmit={handleNewUserSubmit} className="space-y-4">
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 You've been invited to join <span className="font-medium">{invite?.group_name}</span> as{' '}
                 <span className="font-medium">{invite?.email}</span>.
               </p>
@@ -175,7 +182,7 @@ export default function InvitePage() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              {submitError && <p className="text-sm text-red-600">{submitError}</p>}
+              {submitError && <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>}
               <button type="submit" disabled={submitting} className="btn-primary w-full">
                 {submitting ? 'Creating account…' : 'Create account & request to join'}
               </button>

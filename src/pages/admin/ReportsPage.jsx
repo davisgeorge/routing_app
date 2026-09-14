@@ -97,14 +97,14 @@ export default function ReportsPage() {
 
   return (
     <div className="p-6 md:p-8">
-      <h1 className="mb-6 text-xl font-semibold text-slate-900">Reports</h1>
+      <h1 className="mb-6 text-xl font-semibold text-slate-900 dark:text-slate-100">Reports</h1>
 
       <div className="card">
-        <h2 className="mb-4 text-sm font-semibold text-slate-700">Doors called &amp; maps completed per month</h2>
+        <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-300">Doors called &amp; maps completed per month</h2>
         {loading ? (
-          <p className="text-sm text-slate-400">Loading…</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500">Loading…</p>
         ) : chartData.length === 0 ? (
-          <p className="text-sm text-slate-400">No activity recorded yet.</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500">No activity recorded yet.</p>
         ) : (
           <div style={{ width: '100%', height: 320 }}>
             <ResponsiveContainer>

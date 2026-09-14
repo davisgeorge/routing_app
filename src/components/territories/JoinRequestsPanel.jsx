@@ -48,8 +48,8 @@ export default function JoinRequestsPanel({ groupId }) {
 
   return (
     <div className="card mb-6">
-      <h2 className="mb-3 text-sm font-semibold text-slate-700">Join requests</h2>
-      <ul className="divide-y divide-slate-100">
+      <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Join requests</h2>
+      <ul className="divide-y divide-slate-100 dark:divide-slate-800">
         {requests.map((r) => (
           <li key={r.id} className="flex items-center justify-between py-2 text-sm">
             <span>{names[r.user_id] || r.user_id}</span>

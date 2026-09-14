@@ -44,12 +44,12 @@ export default function AddAddressModal({ territory, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
+      <div className="w-full max-w-sm rounded-xl bg-white dark:bg-slate-800 p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             Add Address — Map {territory.map_number}{territory.map_sub}
           </h2>
-          <button type="button" className="text-slate-400 hover:text-slate-600" onClick={onClose} aria-label="Close">
+          <button type="button" className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300" onClick={onClose} aria-label="Close">
             ✕
           </button>
         </div>
@@ -71,7 +71,7 @@ export default function AddAddressModal({ territory, onClose }) {
           </div>
           <div>
             <label className="label" htmlFor="addr-suburb">Suburb</label>
-            <input id="addr-suburb" disabled className="input bg-slate-100 text-slate-500" value={territory.suburb} />
+            <input id="addr-suburb" disabled className="input bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400" value={territory.suburb} />
           </div>
           <div>
             <label className="label" htmlFor="addr-tongue">Mother tongue (optional)</label>
@@ -84,7 +84,7 @@ export default function AddAddressModal({ territory, onClose }) {
             />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" className="btn-ghost" onClick={onClose}>Cancel</button>

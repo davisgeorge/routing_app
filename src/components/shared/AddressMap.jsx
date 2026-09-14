@@ -41,7 +41,7 @@ export default function AddressMap({ addresses, getColor, getPopupText, height =
 
   if (points.length === 0) {
     return (
-      <div className="flex items-center justify-center text-sm text-slate-400" style={{ height }}>
+      <div className="flex items-center justify-center text-sm text-slate-400 dark:text-slate-500" style={{ height }}>
         No geocoded addresses to show on the map yet.
       </div>
     )

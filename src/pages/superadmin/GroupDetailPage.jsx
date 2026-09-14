@@ -78,13 +78,13 @@ export default function GroupDetailPage() {
     <div className="p-6 md:p-8">
       <Link to="/super-admin" className="mb-4 inline-block text-sm text-brand hover:underline">← Back to overview</Link>
 
-      <h1 className="mb-6 text-xl font-semibold text-slate-900">{group?.name || 'Group'}</h1>
+      <h1 className="mb-6 text-xl font-semibold text-slate-900 dark:text-slate-100">{group?.name || 'Group'}</h1>
 
       <JoinRequestsPanel groupId={groupId} />
 
       <div className="card mb-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-700">Publishers</h2>
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Publishers</h2>
           <button type="button" className="btn-soft" onClick={() => setCreatingPublisher(true)}>
             + Create Publisher
           </button>
@@ -94,8 +94,8 @@ export default function GroupDetailPage() {
 
       <div className="card mb-6">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-slate-700">Map ({addresses.length} addresses)</h2>
-          <div className="flex flex-wrap gap-3 text-xs text-slate-500">
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Map ({addresses.length} addresses)</h2>
+          <div className="flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400">
             <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full" style={{ background: STATUS_COLOR.available }} />Available</span>
             <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full" style={{ background: STATUS_COLOR.active }} />Active</span>
             <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full" style={{ background: STATUS_COLOR.completed }} />Completed</span>
@@ -113,12 +113,12 @@ export default function GroupDetailPage() {
         />
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold text-slate-700">Members</h2>
+      <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Members</h2>
       <div className="mb-6">
         <MembersTable groupId={groupId} />
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold text-slate-700">Territories</h2>
+      <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Territories</h2>
       <TerritoriesTable
         territories={territories}
         members={members}

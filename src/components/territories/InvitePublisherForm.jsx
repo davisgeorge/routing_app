@@ -66,17 +66,17 @@ export default function InvitePublisherForm({ groupId }) {
           {submitting ? 'Creating…' : 'Create invite link'}
         </button>
       </form>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
       {inviteLink && (
-        <div className="mt-3 flex items-center gap-2 rounded-lg bg-slate-50 p-2 text-sm">
-          <span className="flex-1 truncate text-slate-600">{inviteLink}</span>
+        <div className="mt-3 flex items-center gap-2 rounded-lg bg-slate-50 dark:bg-slate-900 p-2 text-sm">
+          <span className="flex-1 truncate text-slate-600 dark:text-slate-300">{inviteLink}</span>
           <button type="button" className="btn-ghost px-2 py-1" onClick={copyLink}>
             {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
       )}
       {inviteLink && (
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
           There's no email service on the free plan — send this link to them yourself (WhatsApp, SMS, etc).
         </p>
       )}

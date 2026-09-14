@@ -31,8 +31,8 @@ function NoProfileScreen() {
   return (
     <div className="flex h-screen items-center justify-center px-4">
       <div className="card max-w-sm text-center">
-        <h1 className="mb-2 text-lg font-semibold text-slate-900">No profile found</h1>
-        <p className="mb-4 text-sm text-slate-600">
+        <h1 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">No profile found</h1>
+        <p className="mb-4 text-sm text-slate-600 dark:text-slate-300">
           Your account is signed in but isn't set up in TerritoryMap yet. If you just requested to join a group,
           wait for an admin to approve you. 
         </p>

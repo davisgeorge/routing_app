@@ -31,13 +31,13 @@ export default function AdminOverview() {
 
   return (
     <div className="p-6 md:p-8">
-      <h1 className="mb-6 text-xl font-semibold text-slate-900">Territories</h1>
+      <h1 className="mb-6 text-xl font-semibold text-slate-900 dark:text-slate-100">Territories</h1>
 
       <JoinRequestsPanel groupId={groupId} />
 
       <div className="card mb-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-700">Publishers</h2>
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Publishers</h2>
           <button type="button" className="btn-soft" onClick={() => setCreatingPublisher(true)}>
             + Create Publisher
           </button>

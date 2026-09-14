@@ -29,13 +29,13 @@ export default function AllTerritoriesPage() {
 
   return (
     <div className="p-6 md:p-8">
-      <h1 className="mb-6 text-xl font-semibold text-slate-900">All Territories</h1>
+      <h1 className="mb-6 text-xl font-semibold text-slate-900 dark:text-slate-100">All Territories</h1>
       <div className="card">
         <TerritoryFilterBar territories={territories} filters={filters} onChange={setFilters} />
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500">
+              <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400">
                 <th className="py-2 pr-4">Map</th>
                 <th className="py-2 pr-4">Suburb</th>
                 <th className="py-2 pr-4">Addresses</th>
@@ -44,10 +44,10 @@ export default function AllTerritoriesPage() {
             </thead>
             <tbody>
               {visible.map((t) => (
-                <tr key={t.id} className="border-b border-slate-50">
-                  <td className="py-2 pr-4 font-medium text-slate-700">{t.map_number}{t.map_sub}</td>
-                  <td className="py-2 pr-4 text-slate-600">{t.suburb}</td>
-                  <td className="py-2 pr-4 text-slate-600">{t.total_addresses || 0}</td>
+                <tr key={t.id} className="border-b border-slate-50 dark:border-slate-800">
+                  <td className="py-2 pr-4 font-medium text-slate-700 dark:text-slate-300">{t.map_number}{t.map_sub}</td>
+                  <td className="py-2 pr-4 text-slate-600 dark:text-slate-300">{t.suburb}</td>
+                  <td className="py-2 pr-4 text-slate-600 dark:text-slate-300">{t.total_addresses || 0}</td>
                   <td className="py-2 pr-4">
                     <span className={STATUS_PILL[t.status] || 'pill-available'}>{t.status}</span>
                   </td>
@@ -55,7 +55,7 @@ export default function AllTerritoriesPage() {
               ))}
               {visible.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="py-6 text-center text-slate-400">
+                  <td colSpan={4} className="py-6 text-center text-slate-400 dark:text-slate-500">
                     {territories.length === 0 ? 'No territories yet.' : 'No territories match these filters.'}
                   </td>
                 </tr>

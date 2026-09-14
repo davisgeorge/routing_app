@@ -1,4 +1,4 @@
-const STATUS_LABEL = { H: 'Home', NH: 'Not Home', NLH: 'No Longer Hindi' }
+const STATUS_LABEL = { H: 'Home', NH: 'Not Home', NLH: 'Do Not Call' }
 const STATUS_PILL_CLASS = { H: 'pill-complete', NH: 'pill-active', NLH: 'pill-available' }
 
 /**
@@ -8,28 +8,28 @@ const STATUS_PILL_CLASS = { H: 'pill-complete', NH: 'pill-active', NLH: 'pill-av
  */
 export default function AddressStatusList({ addresses, statusByAddressId, currentAddressId }) {
   if (addresses.length === 0) {
-    return <p className="p-4 text-sm text-slate-400">No addresses on this route yet.</p>
+    return <p className="p-4 text-sm text-slate-400 dark:text-slate-500">No addresses on this route yet.</p>
   }
 
   return (
-    <div className="divide-y divide-slate-100">
+    <div className="divide-y divide-slate-100 dark:divide-slate-800">
       {addresses.map((a, i) => {
         const status = statusByAddressId?.get(a.id)
         const isCurrent = a.id === currentAddressId
         return (
-          <div key={a.id} className={`flex items-center gap-3 px-4 py-2.5 ${isCurrent ? 'bg-brand-50' : ''}`}>
+          <div key={a.id} className={`flex items-center gap-3 px-4 py-2.5 ${isCurrent ? 'bg-brand-50 dark:bg-brand-900/30' : ''}`}>
             <span
               className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-                isCurrent ? 'bg-brand text-white' : 'border border-brand text-brand-700'
+                isCurrent ? 'bg-brand text-white' : 'border border-brand text-brand-700 dark:text-brand-300'
               }`}
             >
               {i + 1}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-slate-800">
+              <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-200">
                 {a.street_number} {a.unit && `Unit ${a.unit}`} {a.street_name}
               </p>
-              {a.mother_tongue && <p className="truncate text-xs text-slate-400">{a.mother_tongue}</p>}
+              {a.mother_tongue && <p className="truncate text-xs text-slate-400 dark:text-slate-500">{a.mother_tongue}</p>}
             </div>
             <span className={STATUS_PILL_CLASS[status] || 'pill-available'}>
               {STATUS_LABEL[status] || 'Not visited'}

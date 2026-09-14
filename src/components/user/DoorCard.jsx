@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext'
 const OPTIONS = [
   { value: 'H', label: 'Home' },
   { value: 'NH', label: 'Not Home' },
-  { value: 'NLH', label: 'No Longer Hindi' },
+  { value: 'NLH', label: 'Do Not Call' },
 ]
 
 /**
@@ -54,10 +54,10 @@ export default function DoorCard({ address, territoryId, source = 'assigned', on
 
   return (
     <div className="card">
-      <p className="font-medium text-slate-800">
+      <p className="font-medium text-slate-800 dark:text-slate-200">
         {address.street_number} {address.unit && `Unit ${address.unit}`} {address.street_name}
       </p>
-      {address.mother_tongue && <p className="text-xs text-slate-400">{address.mother_tongue}</p>}
+      {address.mother_tongue && <p className="text-xs text-slate-400 dark:text-slate-500">{address.mother_tongue}</p>}
 
       <input
         type="text"
@@ -81,7 +81,7 @@ export default function DoorCard({ address, territoryId, source = 'assigned', on
         ))}
       </div>
 
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
     </div>
   )
 }

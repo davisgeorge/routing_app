@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useTheme } from '../../context/ThemeContext'
 
 const ICON_PROPS = {
   viewBox: '0 0 24 24',
@@ -61,10 +62,44 @@ const ICONS = {
   ),
 }
 
+function SunIcon() {
+  return (
+    <svg {...ICON_PROPS} className="h-4 w-4">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+    </svg>
+  )
+}
+
+function MoonIcon() {
+  return (
+    <svg {...ICON_PROPS} className="h-4 w-4">
+      <path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z" />
+    </svg>
+  )
+}
+
+function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme()
+  const isDark = theme === 'dark'
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 transition-all hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
+    >
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center">{isDark ? <MoonIcon /> : <SunIcon />}</span>
+      {isDark ? 'Dark mode' : 'Light mode'}
+    </button>
+  )
+}
+
 const NAV_BY_ROLE = {
   super_admin: [
     { to: '/super-admin', label: 'Overview', end: true, icon: 'grid' },
     { to: '/super-admin/import', label: 'Import data', icon: 'upload' },
+    { to: '/super-admin/members', label: 'Members', icon: 'person' },
     { to: '/super-admin/route', label: 'My Routes', icon: 'route' },
   ],
   admin: [
@@ -98,7 +133,7 @@ function NavLinks({ items, onNavigate }) {
           onClick={onNavigate}
           className={({ isActive }) =>
             `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
-              isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              isActive ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100'
             }`
           }
         >
@@ -126,10 +161,10 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
+      <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 md:hidden">
         <div className="flex items-center gap-2">
           <Logo />
-          <span className="text-base font-bold tracking-tight text-slate-900">TerritoryMap</span>
+          <span className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">TerritoryMap</span>
         </div>
         <button
           type="button"
@@ -146,7 +181,7 @@ export default function Sidebar() {
       {mobileOpen && (
         <div className="fixed inset-0 z-40 flex md:hidden">
           <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-[1px]" onClick={() => setMobileOpen(false)} />
-          <aside className="relative flex h-full w-64 flex-col bg-white py-4 shadow-xl">
+          <aside className="relative flex h-full w-64 flex-col bg-white dark:bg-slate-800 py-4 shadow-xl">
             <SidebarHeader profile={profile} />
             <NavLinks items={items} onNavigate={() => setMobileOpen(false)} />
             <SidebarFooter logout={logout} />
@@ -155,7 +190,7 @@ export default function Sidebar() {
       )}
 
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 flex-col border-r border-slate-200 bg-white py-5 md:flex">
+      <aside className="hidden w-64 flex-col border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-5 md:flex">
         <SidebarHeader profile={profile} />
         <NavLinks items={items} />
         <SidebarFooter logout={logout} />
@@ -169,9 +204,9 @@ function SidebarHeader({ profile }) {
     <div className="mb-6 flex items-center gap-2.5 px-4">
       <Logo />
       <div>
-        <p className="text-base font-bold leading-tight tracking-tight text-slate-900">TerritoryMap</p>
+        <p className="text-base font-bold leading-tight tracking-tight text-slate-900 dark:text-slate-100">TerritoryMap</p>
         {profile && (
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
             {ROLE_LABEL[profile.role] || profile.role}
           </p>
         )}
@@ -183,8 +218,9 @@ function SidebarHeader({ profile }) {
 function SidebarFooter({ logout }) {
   const { profile } = useAuth()
   return (
-    <div className="border-t border-slate-200 px-3 pt-3">
-      {profile?.name && <p className="truncate px-3 text-sm font-medium text-slate-700">{profile.name}</p>}
+    <div className="border-t border-slate-200 dark:border-slate-700 px-3 pt-3">
+      {profile?.name && <p className="truncate px-3 pb-1 text-sm font-medium text-slate-700 dark:text-slate-300">{profile.name}</p>}
+      <ThemeToggle />
       <button type="button" onClick={logout} className="btn-ghost mt-1 w-full justify-start">
         Sign out
       </button>

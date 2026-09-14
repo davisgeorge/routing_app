@@ -17,7 +17,7 @@ export default function OfflineBanner() {
   if (online) return null
 
   return (
-    <div className="bg-amber-100 px-4 py-2 text-center text-sm font-medium text-amber-800">
+    <div className="bg-amber-100 dark:bg-amber-900/40 px-4 py-2 text-center text-sm font-medium text-amber-800 dark:text-amber-200">
       You're offline — changes will sync automatically once you're back online.
     </div>
   )

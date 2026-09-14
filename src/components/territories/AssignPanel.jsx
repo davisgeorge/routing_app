@@ -48,31 +48,31 @@ export default function AssignPanel({ territory, members, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
+      <div className="w-full max-w-sm rounded-xl bg-white dark:bg-slate-800 p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             Assign Map {territory.map_number}{territory.map_sub}
           </h2>
-          <button type="button" className="text-slate-400 hover:text-slate-600" onClick={onClose} aria-label="Close">
+          <button type="button" className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300" onClick={onClose} aria-label="Close">
             ✕
           </button>
         </div>
 
         {members.length === 0 ? (
-          <p className="text-sm text-slate-400">No publishers in this group yet — send an invite first.</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500">No publishers in this group yet — send an invite first.</p>
         ) : (
           <div className="max-h-64 space-y-1 overflow-y-auto">
             {members.map((m) => (
-              <label key={m.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50">
+              <label key={m.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50 dark:hover:bg-slate-900">
                 <input type="checkbox" checked={selected.includes(m.id)} onChange={() => toggle(m.id)} />
                 <span>{m.name}</span>
-                <span className="text-xs text-slate-400">{m.email}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">{m.email}</span>
               </label>
             ))}
           </div>
         )}
 
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
 
         <div className="mt-4 flex justify-end gap-2">
           <button type="button" className="btn-ghost" onClick={onClose}>Cancel</button>

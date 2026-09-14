@@ -150,7 +150,7 @@ export default function ImportPage() {
 
   return (
     <div className="mx-auto max-w-3xl p-6 md:p-8">
-      <h1 className="mb-6 text-xl font-semibold text-slate-900">Import data</h1>
+      <h1 className="mb-6 text-xl font-semibold text-slate-900 dark:text-slate-100">Import data</h1>
 
       <div className="card mb-6 space-y-4">
         <div>
@@ -160,7 +160,7 @@ export default function ImportPage() {
             type="file"
             accept=".xlsx,.xlsm,.xls"
             onChange={handleFile}
-            className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100"
+            className="block w-full text-sm text-slate-600 dark:text-slate-300 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-brand-900/40 dark:file:text-brand-300 dark:hover:file:bg-brand-900/60"
           />
         </div>
 
@@ -187,18 +187,18 @@ export default function ImportPage() {
           </div>
         )}
 
-        {parseError && <p className="text-sm text-red-600">{parseError}</p>}
+        {parseError && <p className="text-sm text-red-600 dark:text-red-400">{parseError}</p>}
       </div>
 
       {rows.length > 0 && (
         <div className="card mb-6">
-          <h2 className="mb-3 text-sm font-semibold text-slate-700">
+          <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
             Preview — {rows.length} address{rows.length === 1 ? '' : 'es'} found
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500">
+                <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400">
                   <th className="py-1 pr-4">Region</th>
                   <th className="py-1 pr-4">Map</th>
                   <th className="py-1 pr-4">Suburb</th>
@@ -208,7 +208,7 @@ export default function ImportPage() {
               </thead>
               <tbody>
                 {rows.slice(0, 8).map((row, i) => (
-                  <tr key={i} className="border-b border-slate-50 text-slate-700">
+                  <tr key={i} className="border-b border-slate-50 dark:border-slate-800 text-slate-700 dark:text-slate-300">
                     <td className="py-1 pr-4">{row.region}</td>
                     <td className="py-1 pr-4">{row.mapNumber}{row.mapSub}</td>
                     <td className="py-1 pr-4">{row.suburb}</td>
@@ -233,25 +233,25 @@ export default function ImportPage() {
 
       {importing && (
         <div className="card mb-6">
-          <div className="mb-2 flex justify-between text-sm text-slate-500">
+          <div className="mb-2 flex justify-between text-sm text-slate-500 dark:text-slate-400">
             <span>{PHASE_LABEL[progress.phase]} — {progress.done} of {progress.total}</span>
             <span>{pct}%</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
             <div className="h-full bg-brand transition-all" style={{ width: `${pct}%` }} />
           </div>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
             Geocoding runs in this browser tab (no server available on the free plan) — please keep it open until this finishes.
           </p>
         </div>
       )}
 
-      {importError && <p className="text-sm text-red-600">{importError}</p>}
+      {importError && <p className="text-sm text-red-600 dark:text-red-400">{importError}</p>}
 
       {summary && (
-        <div className="card border-emerald-200 bg-emerald-50">
-          <p className="text-sm font-medium text-emerald-800">Import complete</p>
-          <ul className="mt-2 text-sm text-emerald-700">
+        <div className="card border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30">
+          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">Import complete</p>
+          <ul className="mt-2 text-sm text-emerald-700 dark:text-emerald-300">
             <li>{summary.imported} addresses imported</li>
             <li>{summary.skipped} already existed (skipped)</li>
             {summary.geocodeFailures > 0 && <li>{summary.geocodeFailures} addresses failed to geocode — lat/lng left blank</li>}

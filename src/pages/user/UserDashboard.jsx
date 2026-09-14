@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { getRouteGeometry, optimiseRoute } from '../../utils/osrm'
 import { getCurrentPositionOnce } from '../../hooks/useLiveLocation'
 import { reoptimiseRemaining } from '../../utils/routeReorder'
+import { buildGoogleMapsLegs } from '../../utils/googleMapsHandoff'
 import RouteMap from '../../components/user/RouteMap'
 import DoorCard from '../../components/user/DoorCard'
 import CollapsibleAddressList from '../../components/routes/CollapsibleAddressList'
@@ -19,6 +20,8 @@ export default function UserDashboard() {
   const [optimising, setOptimising] = useState(false)
   const [routeGeometry, setRouteGeometry] = useState(null)
   const [error, setError] = useState('')
+  const [openingMaps, setOpeningMaps] = useState(false)
+  const [mapsLegs, setMapsLegs] = useState([])
   const autoOptimisedRef = useRef(new Set())
 
   useEffect(() => {
@@ -169,11 +172,28 @@ export default function UserDashboard() {
     }
   }
 
+  // Hands off to Google's own free "dir" URL scheme (no API key/billing) —
+  // OSRM only decided the stop ORDER above; Google's app does the actual
+  // turn-by-turn walking navigation, live traffic/closures and voice
+  // guidance, which our own OSRM-only map can't match. A single directions
+  // URL tops out at 10 stops, so a longer route comes back as several legs
+  // — this opens the first and keeps the rest as buttons to open in turn.
+  const handleOpenInGoogleMaps = async () => {
+    const pending = orderedAddresses.filter((a) => !calledAddressIds.has(a.id))
+    if (pending.length === 0) return
+    setOpeningMaps(true)
+    const position = await getCurrentPositionOnce()
+    setOpeningMaps(false)
+    const legs = buildGoogleMapsLegs(position, pending)
+    setMapsLegs(legs)
+    if (legs.length > 0) window.open(legs[0].url, '_blank')
+  }
+
   if (assignments.length === 0) {
     return (
       <div className="p-6 md:p-8">
-        <h1 className="mb-2 text-xl font-semibold text-slate-900">My territories</h1>
-        <p className="text-sm text-slate-400">No territories assigned to you right now.</p>
+        <h1 className="mb-2 text-xl font-semibold text-slate-900 dark:text-slate-100">My territories</h1>
+        <p className="text-sm text-slate-400 dark:text-slate-500">No territories assigned to you right now.</p>
       </div>
     )
   }
@@ -181,8 +201,8 @@ export default function UserDashboard() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="shrink-0 border-b border-slate-200 p-4">
-        <h1 className="mb-3 text-lg font-semibold text-slate-900">My territories</h1>
+      <div className="shrink-0 border-b border-slate-200 dark:border-slate-700 p-4">
+        <h1 className="mb-3 text-lg font-semibold text-slate-900 dark:text-slate-100">My territories</h1>
         <div className="mb-3 flex flex-wrap gap-2">
           {assignments.map((a) => {
             const t = territories[a.territory_id]
@@ -192,7 +212,7 @@ export default function UserDashboard() {
                 type="button"
                 onClick={() => setSelectedAssignmentId(a.id)}
                 className={`rounded-full border px-3 py-1 text-xs font-medium ${
-                  a.id === selectedAssignmentId ? 'border-brand bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600'
+                  a.id === selectedAssignmentId ? 'border-brand bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
                 }`}
               >
                 {t ? `Map ${t.map_number}${t.map_sub} — ${t.suburb}` : 'Loading…'}
@@ -203,7 +223,36 @@ export default function UserDashboard() {
         <button type="button" disabled={optimising} onClick={handleOptimise} className="btn-primary w-full">
           {optimising ? 'Optimising…' : 'Re-optimise route'}
         </button>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        <button
+          type="button"
+          disabled={openingMaps || !currentAddress}
+          onClick={handleOpenInGoogleMaps}
+          className="btn-soft mt-2 w-full"
+        >
+          {openingMaps ? 'Locating you…' : '📍 Open in Google Maps'}
+        </button>
+        {mapsLegs.length > 1 && (
+          <div className="mt-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 p-2.5">
+            <p className="mb-2 text-xs text-amber-700 dark:text-amber-300">
+              This route has too many stops for one Google Maps link, so it's split into {mapsLegs.length} legs —
+              open the next one once you finish the leg before it.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {mapsLegs.map((leg, i) => (
+                <a
+                  key={i}
+                  href={leg.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-800 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-300"
+                >
+                  Leg {i + 1} ({leg.stopCount} stops)
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+        {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
       </div>
 
       {/* Map — the dominant, flexible-space element */}
@@ -212,7 +261,7 @@ export default function UserDashboard() {
       </div>
 
       {/* Current door */}
-      <div className="shrink-0 border-b border-slate-200 p-4">
+      <div className="shrink-0 border-b border-slate-200 dark:border-slate-700 p-4">
         {currentAddress ? (
           <DoorCard
             key={currentAddress.id}
@@ -222,7 +271,7 @@ export default function UserDashboard() {
             onRecorded={handleDoorRecorded}
           />
         ) : (
-          <p className="text-sm text-slate-400">You've visited every address in this territory.</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500">You've visited every address in this territory.</p>
         )}
       </div>
 

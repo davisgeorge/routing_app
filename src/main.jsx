@@ -15,10 +15,15 @@ const hasFirebaseConfig = Boolean(
 
 async function bootstrap() {
   const root = createRoot(document.getElementById('root'))
+  const { ThemeProvider } = await import('./context/ThemeContext.jsx')
 
   if (!hasFirebaseConfig) {
     const { default: SetupRequired } = await import('./SetupRequired.jsx')
-    root.render(<SetupRequired />)
+    root.render(
+      <ThemeProvider>
+        <SetupRequired />
+      </ThemeProvider>,
+    )
     return
   }
 
@@ -29,11 +34,13 @@ async function bootstrap() {
 
   root.render(
     <StrictMode>
-      <BrowserRouter>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </BrowserRouter>
+      </ThemeProvider>
     </StrictMode>,
   )
 }

@@ -10,7 +10,7 @@ starts with zero re-explanation needed.
 TerritoryMap is a Hindi community canvassing app for the Hamilton Hindi Group
 (New Zealand). Volunteers (called "publishers") are assigned map territories
 and knock on doors to find Hindi-speaking households. They record each door
-as H (Home), NH (Not Home), or NLH (No Longer Hindi).
+as H (Home), NH (Not Home), or NLH (displayed in the UI as "Do Not Call").
 
 The data source is `Master_Map_routing.xlsm` — an Excel file with ~2,700
 addresses across Ngaruawahia, Taupiri, Horotiu, and Hamilton. This is what

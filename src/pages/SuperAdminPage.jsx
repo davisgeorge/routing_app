@@ -3,6 +3,7 @@ import Sidebar from '../components/shared/Sidebar'
 import SuperAdminOverview from './superadmin/SuperAdminOverview'
 import ImportPage from './superadmin/ImportPage'
 import GroupDetailPage from './superadmin/GroupDetailPage'
+import MembersPage from './superadmin/MembersPage'
 import MyRoutesPage from './routes/MyRoutesPage'
 
 export default function SuperAdminPage() {
@@ -14,6 +15,7 @@ export default function SuperAdminPage() {
           <Route index element={<SuperAdminOverview />} />
           <Route path="import" element={<ImportPage />} />
           <Route path="groups/:groupId" element={<GroupDetailPage />} />
+          <Route path="members" element={<MembersPage />} />
           <Route path="route" element={<MyRoutesPage />} />
         </Routes>
       </main>

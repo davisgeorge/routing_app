@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 
 const FRIENDLY_ERRORS = {
   'auth/invalid-email': 'That email address looks invalid.',
@@ -13,6 +14,7 @@ const FRIENDLY_ERRORS = {
 
 export default function LoginPage() {
   const { user, login, loading } = useAuth()
+  const { theme } = useTheme()
   const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -42,7 +44,9 @@ export default function LoginPage() {
       className="flex min-h-screen items-center justify-center px-4"
       style={{
         background:
-          'radial-gradient(60% 50% at 50% 0%, rgb(47 86 217 / 0.08), transparent), #f8fafc',
+          theme === 'dark'
+            ? 'radial-gradient(60% 50% at 50% 0%, rgb(47 86 217 / 0.18), transparent), #020617'
+            : 'radial-gradient(60% 50% at 50% 0%, rgb(47 86 217 / 0.08), transparent), #f8fafc',
       }}
     >
       <div className="w-full max-w-sm">
@@ -50,8 +54,8 @@ export default function LoginPage() {
           <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-brand text-lg font-bold text-white shadow-md shadow-brand-600/20">
             T
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">TerritoryMap</h1>
-          <p className="mt-1 text-sm text-slate-500">Hamilton Hindi Group canvassing</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">TerritoryMap</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Hamilton Hindi Group canvassing</p>
         </div>
 
         <form onSubmit={handleSubmit} className="card space-y-4">
@@ -80,7 +84,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
           <button type="submit" disabled={submitting} className="btn-primary w-full">
             {submitting ? 'Signing in…' : 'Sign in'}

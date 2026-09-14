@@ -18,17 +18,17 @@ export default function CollapsibleAddressList({ addresses, statusByAddressId, c
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className="shrink-0 border-t border-slate-200 bg-white">
+    <div className="shrink-0 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-slate-700"
+        className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300"
       >
         <span>Addresses ({addresses.length})</span>
         <ChevronIcon up={expanded} />
       </button>
       {expanded && (
-        <div className="max-h-64 overflow-y-auto border-t border-slate-100">
+        <div className="max-h-64 overflow-y-auto border-t border-slate-100 dark:border-slate-800">
           <AddressStatusList addresses={addresses} statusByAddressId={statusByAddressId} currentAddressId={currentAddressId} />
         </div>
       )}

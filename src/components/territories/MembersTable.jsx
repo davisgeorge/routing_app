@@ -139,7 +139,7 @@ export default function MembersTable({ groupId }) {
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-slate-200 text-slate-500">
+            <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400">
               <th className="py-2 pr-4">Name</th>
               <th className="py-2 pr-4">Email</th>
               <th className="py-2 pr-4">Active territories</th>
@@ -151,16 +151,16 @@ export default function MembersTable({ groupId }) {
             {members.map((m) => {
               const u = users[m.user_id]
               return (
-                <tr key={m.id} className="border-b border-slate-50">
-                  <td className="py-2 pr-4 font-medium text-slate-700">{u?.name || m.user_id}</td>
-                  <td className="py-2 pr-4 text-slate-500">{u?.email || '—'}</td>
-                  <td className="py-2 pr-4 text-slate-600">{activeTerritoriesByUser[m.user_id] || 0}</td>
-                  <td className="py-2 pr-4 text-slate-600">{activityByUser[m.user_id] || 0}</td>
+                <tr key={m.id} className="border-b border-slate-50 dark:border-slate-800">
+                  <td className="py-2 pr-4 font-medium text-slate-700 dark:text-slate-300">{u?.name || m.user_id}</td>
+                  <td className="py-2 pr-4 text-slate-500 dark:text-slate-400">{u?.email || '—'}</td>
+                  <td className="py-2 pr-4 text-slate-600 dark:text-slate-300">{activeTerritoriesByUser[m.user_id] || 0}</td>
+                  <td className="py-2 pr-4 text-slate-600 dark:text-slate-300">{activityByUser[m.user_id] || 0}</td>
                   <td className="py-2 pr-4 text-right">
                     <button
                       type="button"
                       disabled={removingId === m.id}
-                      className="btn-ghost px-3 py-1 text-red-600 hover:bg-red-50"
+                      className="btn-ghost px-3 py-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
                       onClick={() => handleRemove(m)}
                     >
                       {removingId === m.id ? 'Removing…' : 'Remove'}
@@ -171,7 +171,7 @@ export default function MembersTable({ groupId }) {
             })}
             {members.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-6 text-center text-slate-400">No members yet — send an invite above.</td>
+                <td colSpan={5} className="py-6 text-center text-slate-400 dark:text-slate-500">No members yet — send an invite above.</td>
               </tr>
             )}
           </tbody>

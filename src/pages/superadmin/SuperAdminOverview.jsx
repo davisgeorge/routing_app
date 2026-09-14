@@ -8,8 +8,8 @@ import InvitePublisherModal from '../../components/superadmin/InvitePublisherMod
 function StatCard({ label, value }) {
   return (
     <div className="card">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-slate-900">{value}</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
   )
 }
@@ -41,7 +41,7 @@ export default function SuperAdminOverview() {
   return (
     <div className="p-6 md:p-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-slate-900">Overview</h1>
+        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Overview</h1>
         <div className="flex gap-2">
           <button type="button" className="btn-soft" onClick={() => setInviteModalOpen(true)} disabled={groups.length === 0}>
             + Invite Publisher
@@ -61,13 +61,13 @@ export default function SuperAdminOverview() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="card">
-          <h2 className="mb-3 text-sm font-semibold text-slate-700">Regions</h2>
+          <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Regions</h2>
           {regions.length === 0 ? (
-            <p className="text-sm text-slate-400">No regions yet — import data to seed them.</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500">No regions yet — import data to seed them.</p>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {regions.map((region) => (
-                <li key={region.id} className="py-2 text-sm text-slate-700">
+                <li key={region.id} className="py-2 text-sm text-slate-700 dark:text-slate-300">
                   {region.name}
                 </li>
               ))}
@@ -76,16 +76,16 @@ export default function SuperAdminOverview() {
         </div>
 
         <div className="card">
-          <h2 className="mb-3 text-sm font-semibold text-slate-700">Groups</h2>
+          <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Groups</h2>
           {groups.length === 0 ? (
-            <p className="text-sm text-slate-400">No groups yet — create an administrator to create one.</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500">No groups yet — create an administrator to create one.</p>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {groups.map((group) => (
                 <li key={group.id} className="flex items-center justify-between py-2 text-sm">
                   <div>
-                    <p className="font-medium text-slate-700">{group.name}</p>
-                    <p className="text-xs text-slate-400">{adminNameById[group.admin_id] || 'No admin'}</p>
+                    <p className="font-medium text-slate-700 dark:text-slate-300">{group.name}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">{adminNameById[group.admin_id] || 'No admin'}</p>
                   </div>
                   <Link to={`groups/${group.id}`} className="btn-ghost px-3 py-1">View</Link>
                 </li>

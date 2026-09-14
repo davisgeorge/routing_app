@@ -34,15 +34,15 @@ export default function MyRoutesPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3">
-        <div className="flex gap-1 rounded-xl bg-slate-100 p-1">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3">
+        <div className="flex gap-1 rounded-xl bg-slate-100 dark:bg-slate-700 p-1">
           {TABS.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => setTab(t.id)}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
-                tab === t.id ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                tab === t.id ? 'bg-white dark:bg-slate-800 text-brand-700 dark:text-brand-300 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
               }`}
             >
               {t.label}
@@ -70,7 +70,7 @@ export default function MyRoutesPage() {
         ) : groupId ? (
           <RoutePicker groupId={groupId} onSaved={() => setTab('active')} />
         ) : (
-          <div className="flex h-full items-center justify-center p-6 text-sm text-slate-400">
+          <div className="flex h-full items-center justify-center p-6 text-sm text-slate-400 dark:text-slate-500">
             Select a group above to browse its territories.
           </div>
         )}

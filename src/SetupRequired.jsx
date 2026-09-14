@@ -17,26 +17,26 @@ const REQUIRED_VARS = [
  */
 export default function SetupRequired() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900 px-4">
       <div className="card w-full max-w-lg">
-        <h1 className="mb-2 text-lg font-semibold text-slate-900">Firebase isn't configured yet</h1>
-        <p className="mb-4 text-sm text-slate-600">
-          TerritoryMap needs a Firebase project before it can run. Copy <code className="rounded bg-slate-100 px-1 py-0.5">.env.example</code> to{' '}
-          <code className="rounded bg-slate-100 px-1 py-0.5">.env</code> and fill in these values from your Firebase
+        <h1 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">Firebase isn't configured yet</h1>
+        <p className="mb-4 text-sm text-slate-600 dark:text-slate-300">
+          TerritoryMap needs a Firebase project before it can run. Copy <code className="rounded bg-slate-100 dark:bg-slate-700 px-1 py-0.5">.env.example</code> to{' '}
+          <code className="rounded bg-slate-100 dark:bg-slate-700 px-1 py-0.5">.env</code> and fill in these values from your Firebase
           project settings (Project settings → General → Your apps → SDK setup and configuration):
         </p>
-        <ul className="mb-4 space-y-1 rounded-lg bg-slate-50 p-3 font-mono text-xs text-slate-700">
+        <ul className="mb-4 space-y-1 rounded-lg bg-slate-50 dark:bg-slate-900 p-3 font-mono text-xs text-slate-700 dark:text-slate-300">
           {REQUIRED_VARS.map((name) => (
             <li key={name}>{name}</li>
           ))}
         </ul>
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           No Firebase project yet? Create one at{' '}
           <a href="https://console.firebase.google.com" target="_blank" rel="noreferrer" className="text-brand hover:underline">
             console.firebase.google.com
           </a>{' '}
           and enable Authentication (email/password) and Firestore — both work on the free Spark plan, no Cloud
-          Functions required. Then restart the dev server so Vite picks up the new <code className="rounded bg-slate-100 px-1 py-0.5">.env</code>.
+          Functions required. Then restart the dev server so Vite picks up the new <code className="rounded bg-slate-100 dark:bg-slate-700 px-1 py-0.5">.env</code>.
         </p>
       </div>
     </div>
